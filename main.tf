@@ -14,6 +14,7 @@ resource "aws_instance" "master" {
   }
   tags = {
     state = var.tag
+    env   = var.env
   }
   volume_tags = {
     type = "default"
@@ -37,3 +38,12 @@ variable "tag" {}
 variable "pub_ip" {}
 variable "timeout" {}
 variable "vol_size" {}
+variable "env" {}
+variable "cidrs" { type = list }
+
+output "instance_name" {
+  value = aws_instance.master.public_dns
+}
+output "instance_addr" {
+  value = aws_instance.master.public_ip
+}
