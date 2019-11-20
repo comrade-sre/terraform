@@ -3,7 +3,7 @@ variable "cluster_name" {
   type    = string
 }
 variable "vpc-id" {}
-
+variable "subnet-eks" {}
 resource "aws_iam_role" "eks-cluster" {
   name               = "terraform-eks-cluster"
   assume_role_policy = <<POLICY
@@ -52,6 +52,20 @@ resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
   security_group_id = "${aws_security_group.eks-cluster.id}"
   to_port           = 443
   type              = "ingress"
+}
+resource "aws_eks_cluster" "mentoring" {
+  name     = var.cluster_name
+  role_arn = "${aws_iam_role.eks-cluster.arn}"
+
+  vpc_config {
+    security_group_ids = ["${aws_security_group.eks-cluster.id}"]
+    subnet_ids         = ["${var.subnet-eks}"]
+  }
+
+  depends_on = [
+    "aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy",
+    "aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy"
+  ]
 }
 output "SG-id" {
   value = aws_security_group.eks-cluster.id

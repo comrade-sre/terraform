@@ -7,7 +7,7 @@ resource "aws_instance" "master" {
   ami                         = var.ami
   instance_type               = var.type
   key_name                    = "controller-key"
-  subnet_id                   = var.subnet
+  subnet_id                   = var.subnet-start
   associate_public_ip_address = var.pub_ip
   root_block_device {
     volume_size = var.vol_size
@@ -33,7 +33,7 @@ variable "region" {
 }
 variable "ami" {}
 variable "type" {}
-variable "subnet" {}
+variable "subnet-start" {}
 variable "tag" {}
 variable "pub_ip" {}
 variable "timeout" {}
