@@ -41,6 +41,7 @@ variable "vol_size" {}
 variable "env" {}
 variable "cidrs" { type = list }
 
+
 output "instance_name" {
   value = aws_instance.master.public_dns
 }
