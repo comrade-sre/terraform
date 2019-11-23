@@ -1,9 +1,3 @@
-variable "cluster_name" {
-  default = "eks-cluster"
-  type    = string
-}
-variable "vpc-id" {}
-variable "subnet-eks" {}
 resource "aws_iam_role" "eks-cluster" {
   name               = "terraform-eks-cluster"
   assume_role_policy = <<POLICY
@@ -66,7 +60,4 @@ resource "aws_eks_cluster" "mentoring" {
     "aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy",
     "aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy"
   ]
-}
-output "SG-id" {
-  value = aws_security_group.eks-cluster.id
 }
