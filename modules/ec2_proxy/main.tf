@@ -1,7 +1,7 @@
 resource "aws_security_group" "sg_for_my_ec2" {
   name        = "proxy-sg"
   description = "SG for my proxy ec2"
-  vpc_id      = var.vpc-id
+  vpc_id      = var.vpc_main
 
   ingress {
     from_port   = 443
@@ -40,14 +40,14 @@ resource "aws_security_group" "sg_for_my_ec2" {
 resource "aws_instance" "master" {
   ami                         = var.ami
   instance_type               = var.type
-  key_name                    = "controller-key"
-  subnet_id                   = var.subnet-start
+  key_name                    = var.key_name
+  subnet_id                   = var.subnet
   associate_public_ip_address = var.pub_ip
   root_block_device {
     volume_size = var.vol_size
   }
 
-  vpc_security_group_ids = ["sg-034f88a009a7d66b6"]
+  vpc_security_group_ids = ["${aws_security_group.sg_for_my_ec2.id}"]
   tags = {
     state = var.tag
   }
