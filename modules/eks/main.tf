@@ -26,7 +26,7 @@ resource "aws_iam_role_policy_attachment" "cluster-AmazonEKSServicePolicy" {
 resource "aws_security_group" "eks-cluster" {
   name        = "terraform-eks-cluster"
   description = "Cluster communication with worker nodes"
-  vpc_id      = var.vpc-id
+  vpc_id      = var.vpc_main
 
   egress {
     from_port   = 0
@@ -47,17 +47,17 @@ resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
   to_port           = 443
   type              = "ingress"
 }
-resource "aws_eks_cluster" "mentoring" {
-  name     = var.cluster_name
-  role_arn = "${aws_iam_role.eks-cluster.arn}"
-
-  vpc_config {
-    security_group_ids = ["${aws_security_group.eks-cluster.id}"]
-    subnet_ids         = ["${var.subnet-eks}"]
-  }
-
-  depends_on = [
-    "aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy",
-    "aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy"
-  ]
-}
+#resource "aws_eks_cluster" "mentoring" {
+#  name     = var.cluster_name
+#  role_arn = "${aws_iam_role.eks-cluster.arn}"
+#
+#  vpc_config {
+#    security_group_ids = ["${aws_security_group.eks-cluster.id}"]
+#    subnet_ids         = ["${var.subnet}"]
+#  }
+#
+#  depends_on = [
+#    "aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy",
+#    "aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy"
+#  ]
+#}

@@ -2,6 +2,6 @@ variable "cluster_name" {
   default = "eks-cluster"
   type    = string
 }
-variable "vpc-id" {}
-variable "subnet-eks" {}
+variable "vpc_main" {}
+variable "subnet" {}
 
