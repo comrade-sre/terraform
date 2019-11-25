@@ -5,22 +5,55 @@ provider "aws" {
 module "ec2_proxy" {
   source = "./modules/ec2_proxy/"
 
-  ami        = "ami-040a1551f9c9d11ad"
-  type       = "t2.micro"
-  subnet     = "subnet-a82284c2"
-  sg_default = "sg-1e48517c"
-  tag        = "test"
-  pub_ip     = "true"
-  timeout    = "2m"
-  vol_size   = "15"
-  cidrs      = ["172.31.32.0/20", "172.31.0.0/20", "172.31.16.0/20"]
-  vpc_main   = "vpc-5922dc33"
-  key_name   = "controller-key"
+  ami        = var.ami
+  type       = var.type
+  subnet     = var.subnet
+  sg_default = var.sg_default
+  tag        = var.tag
+  pub_ip     = var.pub_ip
+  timeout    = var.timeout
+  vol_size   = var.vol_size
+  cidrs      = var.cidrs
+  vpc_main   = var.vpc_main
+  key_name   = var.key_name
+  key        = var.key
 }
 module "eks" {
   source = "./modules/eks/"
 
-  vpc_main = "vpc-5922dc33"
-  subnet   = "subnet-50100c2d"
+  vpc_main = var.vpc_main
+  subnet   = var.subnet-eks
 }
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "terraform-state-for-comrade"
+  versioning {
+    enabled = true
+  }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "terraform-locks-for-comrade"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+terraform {
+  backend "s3" {
+    bucket  = "terraform-state-for-comrade"
+    key     = "global/s3/terraform.tfstate"
+    regions = var.region
+
+    dynamodb_table = "terraform-locks-for-comrade"
+    encrypt        = true
+  }
+}

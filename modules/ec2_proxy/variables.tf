@@ -18,4 +18,4 @@ variable "key_name" {
   	description = "ssh public key from my ec2 instances"
 	type = "string"
 }
-
+variable "key" {}
