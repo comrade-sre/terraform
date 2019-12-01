@@ -48,13 +48,13 @@ resource "aws_dynamodb_table" "terraform_locks" {
     type = "S"
   }
 }
-#terraform {
-#  backend "s3" {
-#    bucket  = "terraform-state-for-comrade"
-#    key     = "global/s3/terraform.tfstate"
-#    region = "eu-central-1"
-#
-#    dynamodb_table = "terraform-locks-for-comrade"
-#    encrypt        = true
-#  }
-#}
+terraform {
+  backend "s3" {
+    bucket  = "terraform-state-for-comrade"
+    key     = "global/s3/terraform.tfstate"
+    region = "eu-central-1"
+
+    dynamodb_table = "terraform-locks-for-comrade"
+    encrypt        = true
+  }
+}
