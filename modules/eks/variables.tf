@@ -4,4 +4,4 @@ variable "cluster_name" {
 }
 variable "vpc_main" {}
 variable "subnet" {}
-
+variable "subnet_2" {}

@@ -42,7 +42,7 @@ resource "aws_security_group" "eks-cluster" {
   }
 }
 resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
-  cidr_blocks       = ["172.31.0.0/32"]
+  cidr_blocks       = ["172.31.0.0/16"]
   description       = "Allow worksattion to communicate with the cluster API Server"
   from_port         = 443
   protocol          = "tcp"
@@ -58,14 +58,14 @@ resource "aws_eks_cluster" "mentoring" {
 
   vpc_config {
     security_group_ids = ["${aws_security_group.eks-cluster.id}"]
-    subnet_ids         = ["${var.subnet}"]
+    subnet_ids         = ["${var.subnet}", "${var.subnet_2}"]
   }
 
   depends_on = [
     "aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy",
     "aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy"
   ]
-}
+
 
 
 #SG for workers
@@ -114,7 +114,73 @@ resource "aws_security_group_rule" "demo-cluster-ingress" {
   type = "ingress"
 }
 
+data "aws_ami" "eks-worker" {
+  filter {
+    name = "name"
+    values = ["awazon-eks-node${aws_eks_cluster.mentoring.version}-v*"]
+  }
+    most_recent = true
+    owners      = ["602401143452"]
+}
+data "aws_region" "current" {
+}
+locals {
+  demo-node-userdata = <<USERDATA
+#!/bin/bash
+set -o xtrace
+/etc/eks/bootstrap.sh --apiserver-endpoint '${aws_eks_cluster.mentoring.endpoint}' --b64-cluster-ca '${aws_eks_cluster.mentoring.certificate_authority[0].data}' '${var.cluster_name}'
+USERDATA
+
+}
+
+resource "aws_launch_configuration" "mentoring" {
+  associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.demo-node.name
+  image_id                    = data.aws_ami.eks-worker.id
+  instance_type               = "m4.large"
+  name_prefix                 = "terraform-eks-mentoring"
+  security_groups  = [aws_security_group.worker-node.id]
+  user_data_base64 = base64encode(local.demo-node-userdata)
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "mentoring" {
+  desired_capacity = 2
+  launch_configuration = aws_launch_configuration.mentoring.id
+  max_size = 2
+  min_size = 1
+  name = "terraform-eks-mentoring"
+  vpc_zone_identifier = ["${var.subnet}", "${var.subnet_2}"] 
+  tag {
+    key = "Mentoring"
+    value = "true"
+    propogate_at_launch = true
+  }
+
+  tags {
+    key = "kubernetes.io/cluster/${var.cluster_name}"
+    value = "owned"
+    propogate_at_launch = true
+  }
+}
+locals {
+  config_map_aws_auth = <<CONFIGMAPAWSAUTH
 
 
-
-
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: ${aws_iam_role.eks-cluster.arn}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+CONFIGMAPAWSAUTH
+}
