@@ -2,48 +2,58 @@ provider "aws" {
   profile = "default"
   region  = var.region
 }
-# Create a new AWS Instance
-resource "aws_instance" "master" {
-  ami                         = var.ami
-  instance_type               = var.type
-  key_name                    = "controller-key"
-  subnet_id                   = var.subnet
-  associate_public_ip_address = var.pub_ip
-  root_block_device {
-    volume_size = var.vol_size
-  }
-  tags = {
-    state = var.tag
-    env   = var.env
-  }
-  volume_tags = {
-    type = "default"
-  }
-  timeouts {
-    create = var.timeout
-    delete = var.timeout
-  }
-}
-resource "aws_key_pair" "controller" {
-  key_name   = "controller-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC78vRhh1cW14xmaN6rqnkc9VEqMif5gO2wfvmz8srU94VcfnolOhSX/OGBASyOYni1yzik854XAbI8Svhyk4PNaxEKX8ICBDpAjQ1v05rHoHA8I32ahAY2cPVp4nZLmNGy6uO6ek0JDEyqOZVrSZa5wdZs34r9Qu/D5QoFa9utuqqeuM1J7l31WNWchBhxZGm/xG03TN2xcyVF9fU7BdMvqj/LyE7lwDKHZ1ll+yHyqLbY8Uhns4F04n2Iyjpzp2/fAM2FB/G4ypY+qT8Ozuu8G2fH3lwpU2yDCrc4WcVSNI/2ynpfYiAAKs6/+5AiAJLtK2E2YBcxwJU8YXOXw36V"
-}
-variable "region" {
-  default = "eu-central-1"
-}
-variable "ami" {}
-variable "type" {}
-variable "subnet" {}
-variable "tag" {}
-variable "pub_ip" {}
-variable "timeout" {}
-variable "vol_size" {}
-variable "env" {}
-variable "cidrs" { type = list }
+module "ec2_proxy" {
+  source = "./modules/ec2_proxy/"
 
-output "instance_name" {
-  value = aws_instance.master.public_dns
+  ami        = var.ami
+  type       = var.type
+  subnet     = var.subnet
+  sg_default = var.sg_default
+  tag        = var.tag
+  pub_ip     = var.pub_ip
+  timeout    = var.timeout
+  vol_size   = var.vol_size
+  cidrs      = var.cidrs
+  vpc_main   = var.vpc_main
+  key_name   = var.key_name
+  key        = var.key
 }
-output "instance_addr" {
-  value = aws_instance.master.public_ip
+module "eks" {
+  source = "./modules/eks/"
+
+  vpc_main = var.vpc_main
+  subnet   = var.subnet-eks
+}
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "terraform-state-for-comrade"
+  versioning {
+    enabled = true
+  }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "terraform-locks-for-comrade"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+terraform {
+  backend "s3" {
+    bucket  = "terraform-state-for-comrade"
+    key     = "global/s3/terraform.tfstate"
+    regions = var.region
+
+    dynamodb_table = "terraform-locks-for-comrade"
+    encrypt        = true
+  }
 }
