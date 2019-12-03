@@ -65,7 +65,7 @@ resource "aws_eks_cluster" "mentoring" {
     "aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy",
     "aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy"
   ]
-
+}
 
 
 #SG for workers
@@ -124,18 +124,10 @@ data "aws_ami" "eks-worker" {
 }
 data "aws_region" "current" {
 }
-locals {
-  demo-node-userdata = <<USERDATA
-#!/bin/bash
-set -o xtrace
-/etc/eks/bootstrap.sh --apiserver-endpoint '${aws_eks_cluster.mentoring.endpoint}' --b64-cluster-ca '${aws_eks_cluster.mentoring.certificate_authority[0].data}' '${var.cluster_name}'
-USERDATA
-
-}
 
 resource "aws_launch_configuration" "mentoring" {
   associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.demo-node.name
+#  iam_instance_profile        = aws_iam_instance_profile.demo-node.name
   image_id                    = data.aws_ami.eks-worker.id
   instance_type               = "m4.large"
   name_prefix                 = "terraform-eks-mentoring"
@@ -157,30 +149,15 @@ resource "aws_autoscaling_group" "mentoring" {
   tag {
     key = "Mentoring"
     value = "true"
-    propogate_at_launch = true
+    propagate_at_launch = true
   }
 
-  tags {
+  tag {
     key = "kubernetes.io/cluster/${var.cluster_name}"
     value = "owned"
-    propogate_at_launch = true
+    propagate_at_launch = true
   }
-}
-locals {
-  config_map_aws_auth = <<CONFIGMAPAWSAUTH
-
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: ${aws_iam_role.eks-cluster.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-CONFIGMAPAWSAUTH
+  timeouts {
+    delete = "15m"
+  }
 }

@@ -50,8 +50,8 @@ resource "aws_dynamodb_table" "terraform_locks" {
 }
 terraform {
   backend "s3" {
-    bucket  = "terraform-state-for-comrade"
-    key     = "global/s3/terraform.tfstate"
+    bucket = "terraform-state-for-comrade"
+    key    = "global/s3/terraform.tfstate"
     region = "eu-central-1"
 
     dynamodb_table = "terraform-locks-for-comrade"
