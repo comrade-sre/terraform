@@ -9,6 +9,5 @@ pub_ip       = "true"
 timeout      = "2m"
 vol_size     = "15"
 cidrs        = ["172.31.32.0/20", "172.31.0.0/20", "172.31.16.0/20"]
-cluster_name = "AWS_EKS"
 vpc_main     = "vpc-5922dc33"
 key_name     = "controller-key"

@@ -17,11 +17,11 @@ POLICY
 }
 resource "aws_iam_role_policy_attachment" "cluster-AmazonEKSClusterPlicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = "${aws_iam_role.eks-cluster.name}"
+  role       = aws_iam_role.eks-cluster.name
 }
 resource "aws_iam_role_policy_attachment" "cluster-AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
-  role       = "${aws_iam_role.eks-cluster.name}"
+  role       = aws_iam_role.eks-cluster.name
 }
 
 
@@ -42,11 +42,11 @@ resource "aws_security_group" "eks-cluster" {
   }
 }
 resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
-  cidr_blocks       = ["172.31.0.0/16"]
-  description       = "Allow worksattion to communicate with the cluster API Server"
+  cidr_blocks       = ["109.252.110.0/24"]
+  description       = "Allow my workstation to communicate with the cluster API Server"
   from_port         = 443
   protocol          = "tcp"
-  security_group_id = "${aws_security_group.eks-cluster.id}"
+  security_group_id = aws_security_group.eks-cluster.id
   to_port           = 443
   type              = "ingress"
 }
@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
 #Control plane init
 resource "aws_eks_cluster" "mentoring" {
   name     = var.cluster_name
-  role_arn = "${aws_iam_role.eks-cluster.arn}"
+  role_arn = aws_iam_role.eks-cluster.arn
 
   vpc_config {
     security_group_ids = ["${aws_security_group.eks-cluster.id}"]
