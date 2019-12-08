@@ -23,7 +23,10 @@ resource "aws_iam_role_policy_attachment" "cluster-AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
   role       = aws_iam_role.eks-cluster.name
 }
-
+resource "aws_iam_instance_profile" "demo-node" {
+  name = "worker"
+  role = aws_iam_role.eks-cluster.name
+}
 
 #SG for control plane
 resource "aws_security_group" "eks-cluster" {
@@ -62,8 +65,8 @@ resource "aws_eks_cluster" "mentoring" {
   }
 
   depends_on = [
-    "aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy",
-    "aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy"
+    aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPlicy,
+    aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy
   ]
 }
 
@@ -100,7 +103,7 @@ resource "aws_security_group_rule" "demo-node-ingress-self" {
   from_port = 0
   protocol = "-1"
   security_group_id = aws_security_group.worker-node.id
-  source_security_group_id = aws_security_group.eks-cluster.id
+  source_security_group_id = aws_security_group.worker-node.id
   to_port = 65535
   type = "ingress"
 }
@@ -113,11 +116,37 @@ resource "aws_security_group_rule" "demo-cluster-ingress" {
   to_port = 443
   type = "ingress"
 }
+locals {
+  config_map_aws_auth = <<CONFIGMAPAWSAUTH
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: ${aws_iam_role.eks-cluster.arn}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+CONFIGMAPAWSAUTH
+}
+locals {
+  demo-node-userdata = <<USERDATA
+#!/bin/bash
+set -o xtrace
+/etc/eks/bootstrap.sh --apiserver-endpoint '${aws_eks_cluster.mentoring.endpoint}' --b64-cluster-ca '${aws_eks_cluster.mentoring.certificate_authority[0].data}' '${var.cluster_name}'
+USERDATA
+
+}
 
 data "aws_ami" "eks-worker" {
   filter {
     name = "name"
-    values = ["awazon-eks-node${aws_eks_cluster.mentoring.version}-v*"]
+    values = ["awazon-eks-node-${aws_eks_cluster.mentoring.version}-v*"]
   }
     most_recent = true
     owners      = ["602401143452"]
@@ -127,7 +156,7 @@ data "aws_region" "current" {
 
 resource "aws_launch_configuration" "mentoring" {
   associate_public_ip_address = true
-#  iam_instance_profile        = aws_iam_instance_profile.demo-node.name
+  iam_instance_profile        = aws_iam_instance_profile.demo-node.name
   image_id                    = data.aws_ami.eks-worker.id
   instance_type               = "m4.large"
   name_prefix                 = "terraform-eks-mentoring"

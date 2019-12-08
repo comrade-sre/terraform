@@ -28,7 +28,3 @@ users:
         - "${var.cluster_name}"
 KUBECONFIG
 }
-
-output "kubeconfig" {
-  value = "${local.kubeconfig}"
-}
