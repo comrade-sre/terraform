@@ -23,7 +23,6 @@ module "eks" {
 
   vpc_main = var.vpc_main
   subnet   = var.subnet-eks
-  subnet_2 = var.subnet
 }
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state-for-comrade"
@@ -50,9 +49,9 @@ resource "aws_dynamodb_table" "terraform_locks" {
 }
 terraform {
   backend "s3" {
-    bucket = "terraform-state-for-comrade"
-    key    = "global/s3/terraform.tfstate"
-    region = "eu-central-1"
+    bucket  = "terraform-state-for-comrade"
+    key     = "global/s3/terraform.tfstate"
+    regions = var.region
 
     dynamodb_table = "terraform-locks-for-comrade"
     encrypt        = true
