@@ -41,6 +41,13 @@ resource "aws_security_group" "worker-node" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     "Name" = "terraform-eks-worker-node"
     "kuberenetes.io/cluster/${var.cluster_name}" = "owned"
@@ -120,6 +127,7 @@ resource "aws_launch_configuration" "mentoring" {
   name_prefix                 = "terraform-eks-mentoring"
   security_groups  = [aws_security_group.worker-node.id]
   user_data_base64 = base64encode(local.demo-node-userdata)
+  key_name = var.workerKey
 
   lifecycle {
     create_before_destroy = true

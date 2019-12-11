@@ -21,9 +21,10 @@ module "ec2_proxy" {
 module "eks" {
   source = "./modules/eks/"
 
-  vpc_main = var.vpc_main
-  subnet   = var.subnet-eks
-  subnet_2 = var.subnet
+  vpc_main  = var.vpc_main
+  subnet    = var.subnet-eks
+  subnet_2  = var.subnet
+  workerKey = var.workerKey
 }
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state-for-comrade"

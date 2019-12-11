@@ -25,3 +25,4 @@ variable "cluster_name" {
   type    = string
 }
 variable "key" {}
+variable "workerKey" {}
