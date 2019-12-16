@@ -9,7 +9,7 @@ variable "tag" {}
 variable "pub_ip" {}
 variable "timeout" {
   description = "timeout for starting and stoping instances"
-  type        = "string"
+  type        = string
 }
 variable "vol_size" {}
 variable "cidrs" { type = list }
@@ -17,7 +17,7 @@ variable "sg_default" {}
 variable "vpc_main" {}
 variable "key_name" {
   description = "ssh public key from my ec2 instances"
-  type        = "string"
+  type        = string
 }
 
 variable "cluster_name" {
@@ -25,3 +25,4 @@ variable "cluster_name" {
   type    = string
 }
 variable "key" {}
+variable "workerKey" {}
