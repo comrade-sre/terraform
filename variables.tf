@@ -26,3 +26,5 @@ variable "cluster_name" {
 }
 variable "key" {}
 variable "workerKey" {}
+variable "dbuser" {}
+variable "dbpass" {}

@@ -1,7 +1,12 @@
 provider "aws" {
   profile = "default"
   region  = var.region
+  version = "~> 2.41"
 }
+provider "helm" {
+  version = "~> 0.10"
+}
+
 module "ec2_proxy" {
   source = "./modules/ec2_proxy/"
 
@@ -25,6 +30,12 @@ module "eks" {
   subnet    = var.subnet-eks
   subnet_2  = var.subnet
   workerKey = var.workerKey
+}
+module "workload" {
+  source = "./modules/workload/"
+
+  dbuser = var.dbuser
+  dbpass = var.dbpass
 }
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state-for-comrade"
