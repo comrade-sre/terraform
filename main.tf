@@ -6,7 +6,9 @@ provider "aws" {
 provider "helm" {
   version = "~> 0.10"
 }
-
+provider "kubernetes" {
+  version = "~> 1.10"
+}
 module "ec2_proxy" {
   source = "./modules/ec2_proxy/"
 
@@ -30,6 +32,10 @@ module "eks" {
   subnet    = var.subnet-eks
   subnet_2  = var.subnet
   workerKey = var.workerKey
+}
+module "kubernetes" {
+  source = "./modules/kubernetes"
+
 }
 module "workload" {
   source = "./modules/workload/"
