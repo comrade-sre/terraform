@@ -1,8 +1,7 @@
-# terraform
-Модуль ec2_proxy создает инстанс, SG и  ssh ключ. Модуль eks разворачивает control-plane для кластера куберенес в aws и autoscaling-group для worker-nodes.
-Для применения, необходимо предварительно добавить в переменные окружения свой ключ TF_VAR_key.
-Для работы применяются следующие команды:
-terraform init для скачивания провайдеров, инициализации модулей и настройки terraform для работы с s3 как хранилища для state.
-terraform plan для просмотра того, какие ресурсы есть в инфраструктуре, и какие будут созданы при следующем terraform apply. Опционально -out сохраняет план в файл.
-terraform apply для применения вссего плана к инфраструктуре. Опционально -target=resource для развертывания не всего плана, а лишь  конкретного ресурса.
-Перед apply можно сделать taint ресурсов, которые вы хотите пересоздать, даже в случае их наличия. 
+The ec2_proxy module creates an instance, SG and ssh key. The eks module deploys a control-plane for the kubernetes cluster in aws and an autoscaling-group for worker-nodes.
+For use, you must first add your TF_VAR_key to the environment variables.
+The following commands are used for work:
+terraform init for downloading providers, initializing modules, and setting up terraform to work with s3 as storage for state.
+terraform plan to see which resources are in the infrastructure and which will be created next terraform apply. Optional -out saves the plan to a file.
+terraform apply to apply the entire plan to the infrastructure. Optional -target=resource for deploying not the whole plan, but only a specific resource.
+Before apply, you can make taint of the resources that you want to recreate, even if they exist.
