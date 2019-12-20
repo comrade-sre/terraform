@@ -1,7 +1,7 @@
 FROM hashicorp/terraform
-USER comrade
 RUN mkdir /terraform
 WORKDIR /terraform
+ADD .aws /root/
 COPY . /terraform
 RUN terraform init
-CMD ["version"]
+CMD ["plan"]
