@@ -12,4 +12,3 @@ cidrs      = ["172.31.32.0/20", "172.31.0.0/20", "172.31.16.0/20"]
 vpc_main   = "vpc-5922dc33"
 key_name   = "controller-key"
 workerKey  = "workerKey"
-dbuser     = "comrade"
