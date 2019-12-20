@@ -40,8 +40,8 @@ module "kubernetes" {
 module "workload" {
   source = "./modules/workload/"
 
-  dbuser = var.dbuser
-  dbpass = var.dbpass
+  wp_pass = var.wp_pass
+  wp_user = var.wp_user
 }
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state-for-comrade"

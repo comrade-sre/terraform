@@ -1,2 +1,2 @@
-variable "dbuser" {}
-variable "dbpass" {}
+variable "wp_user" {}
+variable "wp_pass" {}

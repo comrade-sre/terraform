@@ -28,3 +28,5 @@ variable "key" {}
 variable "workerKey" {}
 variable "dbuser" {}
 variable "dbpass" {}
+variable "wp_pass" {}
+variable "wp_user" {}
