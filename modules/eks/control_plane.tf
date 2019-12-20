@@ -67,9 +67,10 @@ resource "aws_eks_cluster" "mentoring" {
 resource "null_resource" "generate_kubeconfig" {
   depends_on = [aws_eks_cluster.mentoring]
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name $cluster_name"
+    command = "mkdir /root/.kube && echo $kubeconfig > /root/.kube/config"
     environment = {
       cluster_name = var.cluster_name
+      kubeconfig   = local.kubeconfig
    }
  }
 }
