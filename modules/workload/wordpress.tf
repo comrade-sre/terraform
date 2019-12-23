@@ -10,6 +10,12 @@ resource "helm_release" "workload" {
     name = "wordpressPassword"
     value = var.wp_pass    
   }
+  depends_on = [helm_release.ingress]
 }
 
     
+resource "helm_release" "ingress" {
+  name = "nginx-ingress"
+  chart = "stable/nginx-ingress"
+  version = "1.27.0"
+}
