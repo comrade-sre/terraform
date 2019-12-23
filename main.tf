@@ -33,10 +33,6 @@ module "eks" {
   subnet_2  = var.subnet
   workerKey = var.workerKey
 }
-module "kubernetes" {
-  source = "./modules/kubernetes"
-
-}
 module "workload" {
   source = "./modules/workload/"
 

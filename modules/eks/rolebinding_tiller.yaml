@@ -12,4 +12,5 @@ resource "kubernetes_cluster_role_binding" "tiller_rb" {
     name      = "default"
     namespace = "kube-system"
   }
+  depends_on = [aws_eks_cluster.mentoring]
 }
