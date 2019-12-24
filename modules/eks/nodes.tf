@@ -52,6 +52,9 @@ resource "aws_eks_node_group" "mentoring" {
   remote_access {
     ec2_ssh_key = var.workerKey
   }
+  timeouts {
+    create = "10m"
+  }
 
   depends_on = [
     aws_iam_role_policy_attachment.mentoring-AmazonEKSWorkerNodePolicy,

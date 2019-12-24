@@ -1,5 +1,5 @@
 FROM hashicorp/terraform
-RUN mkdir /terraform && mkdir /root/.kube
+RUN mkdir /terraform 
 WORKDIR /terraform
 ADD .aws /root/
 COPY . /terraform
