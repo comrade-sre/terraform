@@ -37,7 +37,7 @@ resource "aws_security_group" "eks-cluster" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "terrafrom"
+    Name = "terraform"
   }
 }
 resource "aws_security_group_rule" "cluster-ingress-workstation-https" {

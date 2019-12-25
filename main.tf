@@ -39,6 +39,9 @@ module "workload" {
   wp_pass = var.wp_pass
   wp_user = var.wp_user
 }
+module "code_commit" {
+  source = "./modules/code_commit"
+}
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state-for-comrade"
   versioning {
