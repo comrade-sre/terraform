@@ -37,11 +37,11 @@ resource "aws_security_group" "eks-cluster" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "terrafrom"
+    Name = "terraform"
   }
 }
 resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
-  cidr_blocks       = ["109.252.110.0/24"]
+  cidr_blocks       = ["109.252.110.0/24", "81.177.107.0/24"]
   description       = "Allow my workstation to communicate with the cluster API Server"
   from_port         = 443
   protocol          = "tcp"
@@ -64,3 +64,22 @@ resource "aws_eks_cluster" "mentoring" {
     aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy
   ]
 }
+#resource "null_resource" "generate_kubeconfig" {
+#  depends_on = [aws_eks_cluster.mentoring]
+#  provisioner "local-exec" {
+#    command = "mkdir /root/.kube && echo $kubeconfig > /root/.kube/config"
+#    environment = {
+#      cluster_name = var.cluster_name
+#      kubeconfig   = local.kubeconfig
+#   }
+# }
+resource "null_resource" "generate_kubeconfig" {
+  depends_on = [aws_eks_cluster.mentoring]
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name $cluster_name"
+    environment = {
+      cluster_name = var.cluster_name
+   }
+ }
+}
+

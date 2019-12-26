@@ -26,3 +26,5 @@ variable "cluster_name" {
 }
 variable "key" {}
 variable "workerKey" {}
+variable "wp_user" {}
+variable "wp_pass" {}
