@@ -37,7 +37,7 @@ resource "aws_security_group" "eks-cluster" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "terrafrom"
+    Name = "terraform"
   }
 }
 resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
@@ -64,6 +64,15 @@ resource "aws_eks_cluster" "mentoring" {
     aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy
   ]
 }
+#resource "null_resource" "generate_kubeconfig" {
+#  depends_on = [aws_eks_cluster.mentoring]
+#  provisioner "local-exec" {
+#    command = "mkdir /root/.kube && echo $kubeconfig > /root/.kube/config"
+#    environment = {
+#      cluster_name = var.cluster_name
+#      kubeconfig   = local.kubeconfig
+#   }
+# }
 resource "null_resource" "generate_kubeconfig" {
   depends_on = [aws_eks_cluster.mentoring]
   provisioner "local-exec" {
