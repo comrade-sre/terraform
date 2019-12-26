@@ -1,10 +1,11 @@
 FROM hashicorp/terraform
-RUN mkdir  /terraform/
+RUN mkdir  -p /terraform/modules
 WORKDIR /terraform
-RUN whoami
-RUN mkdir /root/.aws
-COPY .aws/* /root/.aws/
-RUN ls /root/.aws/
-COPY . /terraform
-RUN terraform init
+COPY main.tf .
+COPY variables.tf .
+COPY outputs.tf .
+COPY *.tfvars .
+ADD modules ./modules/
+RUN ls -lR
+RUN terraform init -backend=false
 CMD ["plan"]
