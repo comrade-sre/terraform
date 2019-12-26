@@ -6,8 +6,8 @@ output "instance_name" {
 }
 
 output "ssh" {
-  value = module.code_comit.aws_codecommit_repository.comrade_repo.clone_url_ssh
+  value = module.code_commit.ssh
 }
 output "http" {
-  value = module.code_commit.aws_codecommit_repository.comrade_repo.clone_url_http
+  value = module.code_commit.http
 }

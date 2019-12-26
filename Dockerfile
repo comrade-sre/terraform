@@ -1,7 +1,10 @@
 FROM hashicorp/terraform
-RUN mkdir /terraform 
+RUN mkdir  /terraform/
 WORKDIR /terraform
-ADD .aws /root/
+RUN whoami
+RUN mkdir /root/.aws
+COPY .aws/* /root/.aws/
+RUN ls /root/.aws/
 COPY . /terraform
 RUN terraform init
 CMD ["plan"]
