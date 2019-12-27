@@ -1,7 +1,7 @@
 FROM hashicorp/terraform
 RUN mkdir  -p /terraform/modules ~/.aws
 WORKDIR /terraform
-ADD .aws ~/.aws/
+ADD .aws /root/.aws/
 ADD config ~/.kube/
 COPY main.tf .
 COPY variables.tf .
