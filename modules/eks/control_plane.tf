@@ -64,22 +64,38 @@ resource "aws_eks_cluster" "mentoring" {
     aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy
   ]
 }
-#resource "null_resource" "generate_kubeconfig" {
-#  depends_on = [aws_eks_cluster.mentoring]
-#  provisioner "local-exec" {
-#    command = "mkdir /root/.kube && echo $kubeconfig > /root/.kube/config"
-#    environment = {
-#      cluster_name = var.cluster_name
-#      kubeconfig   = local.kubeconfig
-#   }
-# }
 resource "null_resource" "generate_kubeconfig" {
   depends_on = [aws_eks_cluster.mentoring]
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name $cluster_name"
+    command = "mkdir ~/.kube && echo $kubeconfig > ~/.kube/config"
     environment = {
       cluster_name = var.cluster_name
+      kubeconfig   = local.kubeconfig
    }
  }
+#resource "null_resource" "generate_kubeconfig" {
+#  depends_on = [aws_eks_cluster.mentoring]
+#  provisioner "local-exec" {
+#    command = "aws eks update-kubeconfig --name $cluster_name"
+#    environment = {
+#      cluster_name = var.cluster_name
+#   }
+# }
+}
+resource "kubernetes_cluster_role_binding" "tiller_rb" {
+  depends_on = [aws_eks_cluster.mentoring]
+  metadata {
+    name = "terraform-tiller-rb"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = "default"
+    namespace = "kube-system"
+  }
 }
 
