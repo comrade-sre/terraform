@@ -10,7 +10,7 @@ node('master') {
     sh "docker build -t mentoring -f Dockerfile ."
   }
   stage('terraform') {
-        sh "docker run --env-file .env mentoring ${params.action} -target=module.${params.target}"
+        sh "docker run --env-file .env mentoring ${params.action} -target=module.${params.target} -auto-approve"
   }
   stage('clean') {
     cleanWs()
