@@ -44,8 +44,9 @@ module "code_commit" {
 }
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state-for-comrade"
+  acl    = "private"
   versioning {
-    enabled = true
+    enabled = false
   }
   server_side_encryption_configuration {
     rule {
