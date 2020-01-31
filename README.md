@@ -1,4 +1,4 @@
-The ec2_proxy module creates an instance, SG and ssh key. The eks module deploys a control-plane for the kubernetes cluster in aws and an autoscaling-group for worker-nodes.\n
+The ec2_proxy module creates an instance, SG and ssh key. The eks module deploys a control-plane for the kubernetes cluster in aws and an autoscaling-group for worker-nodes.
 For use, you must first add your TF_VAR_key to the environment variables.
 The following commands are used for work:
 terraform init for downloading providers, initializing modules, and setting up terraform to work with s3 as storage for state.
